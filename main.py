@@ -213,7 +213,7 @@ def ask_for_repeat():
 
 
 def menu():
-    print("Pick a program by entering it's number:")
+    print("Pick a program by entering its number:")
     print("Pitch recognition with multiple notes (1)")
     print("Pitch recognition with one note (2)")
     print("Chord recognition (3)")
