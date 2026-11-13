@@ -53,7 +53,7 @@ class Tone:
             self.tones.append(Sine(x))
 
 
-    def play(self, length: float, loudness=1.0):
+    def play(self, length: float, loudness=1.0, block=True):
         utils.check_param(int | float, p="length")
         utils.check_param(int | float, "< 3", "> 0", p="loudness")
 
@@ -63,8 +63,9 @@ class Tone:
         for x in self.tones[1:]:
             a = np.add(a, np.tile(x.snippet,int(length*1.1/x.period)+2)[:array_len])
 
-        sd.play(a*loudness/len(self.tones), SAMPLERATE)
-        time.sleep(length)
+        sd.play(a*loudness/len(self.tones), SAMPLERATE, blocking=block)
+        if block:
+            time.sleep(length)
 
 
 def play_random_notes(n: int, seconds: float) -> list:

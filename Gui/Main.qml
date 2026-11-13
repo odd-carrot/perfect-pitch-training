@@ -53,7 +53,7 @@ ApplicationWindow {
         anchors.top: playSoundButton.bottom
         MouseArea {
             anchors.fill: parent
-            onClicked: python.startSingleNote()
+            onClicked: python.playSingleNote()
         }
         TextField {
             placeholderText: qsTr("Single Note Recognition")
@@ -65,7 +65,7 @@ ApplicationWindow {
                 if (msg) this.placeholderText = msg
                 else this.placeholderText = "YAY"
                 this.clear()
-                python.startSingleNote()
+                python.playSingleNote()
             }
         }
     }

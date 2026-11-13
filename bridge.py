@@ -43,12 +43,12 @@ class Bridge(QObject):
         return return_string
 
     # The last note played in single note recognition for the qml side.
-    qml_note = random.sample(interface.listofnotes, 1)
+    qml_note = random.sample(synth.listofnotes, 1)
 
     @Slot()
-    def startSingleNote(self):
-        self.qml_note = random.sample(interface.listofnotes, 1)
-        synth.Tone(float(interface.notedict[self.qml_note[0]])).play(1)
+    def playSingleNote(self):
+        self.qml_note = random.sample(synth.listofnotes, 1)
+        synth.Tone(float(synth.notedict[self.qml_note[0]])).play(1, block=False)
 
 
     @Slot(str, result=str)

@@ -16,14 +16,6 @@ import bridge
 import synth
 import utils
 
-listoftones = ('130.8', '138.6', '146.8', '155.6', '164.8', '174.6', '185.0', '196.0', '207.7', '220.0', '233.1',
-               '246.9', '261.6', '277.2', '293.7', '311.1', '329.6', '349.2', '370.0', '392.0', '415.3', '440.0',
-               '466.2', '493.9', '523.3', '554.4', '587.3', '622.3', '659.3', '698.5', '740.0', '784.0', '830.6',
-               '880.0', '932.3', '987.8')
-listofnotes = ('C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4',
-               'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5',
-               'G#5', 'A5', 'A#5', 'B5')
-notedict = {k: v for k, v in zip(listofnotes, listoftones)}
 
 
 
@@ -37,8 +29,8 @@ def test_single_note():
     :return: None
     """
     # get a random note from listofnotes
-    note = random.choice(listofnotes)
-    synth.Tone(float(notedict[note])).play(1)
+    note = random.choice(synth.listofnotes)
+    synth.Tone(float(synth.notedict[note])).play(1)
     user_answer = input("What was that note?\n")
     is_correct = "YAY you got it right"
     is_incorrect = f"dang the note was {note[0]}"
@@ -107,11 +99,11 @@ def chord_recognition():
     chord_type = synth.play_chord('random', root)
     print("What was the root of that chord?")
     correct = "correct :D"
-    incorrect = f"INCORRECT :( ({listofnotes[root]})"
+    incorrect = f"INCORRECT :( ({synth.listofnotes[root]})"
     user_answer1 = input(f"Note: ").upper()
-    if listofnotes[root][0] not in user_answer1[:3]:
+    if synth.listofnotes[root][0] not in user_answer1[:3]:
         print(incorrect)
-    elif "#" in listofnotes[root]:
+    elif "#" in synth.listofnotes[root]:
         if "#" not in user_answer1:
             print(incorrect)
         else:
