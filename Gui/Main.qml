@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 import io.sound 1.0
+import "components"
+import "widgets"
 
 ApplicationWindow {
     id: root
@@ -14,9 +16,13 @@ ApplicationWindow {
         function onIsCorrectSignal(correct) {root.color = correct ? "green" : "red"}
     }
     property string pythonNumber: "2"
+
+
+
     Rectangle {
         id: fancyButton
         width: parent.width; height: 20
+        anchors.top: menuBar.bottom
         Text {
             id: numberDisplay
             anchors.centerIn: parent
@@ -68,5 +74,16 @@ ApplicationWindow {
                 python.playSingleNote()
             }
         }
+    }
+    Rectangle{
+        id: menuBar
+        anchors {
+            right: parent.right
+            left: parent.left
+            top: parent.top
+        }
+        height: 25
+        color: "transparent"
+        MainMenu { }
     }
 }

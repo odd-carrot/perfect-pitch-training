@@ -63,8 +63,6 @@ class Tone:
             a = np.add(a, np.tile(x.snippet,int(length*1.1/x.period)+2)[:array_len])
 
         sd.play(a*loudness/len(self.tones), SAMPLERATE, blocking=block)
-        if block:
-            time.sleep(length)
 
 
 def play_random_notes(n: int, seconds: float) -> list:
