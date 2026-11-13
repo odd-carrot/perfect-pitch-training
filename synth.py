@@ -8,7 +8,7 @@ import sounddevice as sd
 import numpy as np
 import time
 import utils
-import main
+import interface
 
 SAMPLERATE = 44100
 
@@ -77,10 +77,10 @@ def play_random_notes(n: int, seconds: float) -> list:
     """
     utils.check_param(int, ">= 0", p="n")
 
-    random_notes = random.sample(main.listofnotes, n)
+    random_notes = random.sample(interface.listofnotes, n)
 
     for i in random_notes:
-        Tone(float(main.notedict[i])).play(seconds)
+        Tone(float(interface.notedict[i])).play(seconds)
 
     return random_notes
 
