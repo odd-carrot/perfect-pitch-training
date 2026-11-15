@@ -1,5 +1,5 @@
 """
-Synth module for playing sine wave tones.
+Synth module for playing sine tones.
 """
 import random
 from itertools import accumulate
@@ -20,6 +20,46 @@ listofnotes = ('C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', '
                'G#5', 'A5', 'A#5', 'B5')
 notedict = {k: v for k, v in zip(listofnotes, listoftones)}
 
+
+note_distance_from_A = {
+    "A": 0,
+    "A#": 1,
+    "Bb": 1,
+    "B": 2,
+    "Cb": 2,
+    "C": 3,
+    "C#": 4,
+    "Db": 4,
+    "D": 5,
+    "D#": 6,
+    "Eb": 6,
+    "E": 7,
+    "Fb": 7,
+    "E#": 8,
+    "F": 8,
+    "F#": 9,
+    "Gb": 9,
+    "G": 10,
+    "G#": 11,
+    "Ab": 11
+}
+
+
+def note_to_freq(note: str, cent_offset: float=0, A4hz=440) -> float:
+    """
+    Turns a note name with a pattern of "<note-letter><optional-#-or-b><optional-octave>" (each being a single char)
+    into frequency. Uses Equal Temperament.
+    :param note: The note to be converted. "<note-letter><optional-#-or-b><optional-octave>"
+    :param cent_offset: Cents are 1/100th of a half step. Anything more than 49 is redundant.
+    :return: The frequency of the note with the specified offset in cents
+    """
+    utils.check_param(float | int, ">=0", "<49", p="cent_offset")
+
+    note_name = note[:2] if note[1] in ("#", "b") else note[:1]
+    note_offset = note_distance_from_A[note_name]
+    octave_offset = int(note[len(note_name):]) - 4 if note[len(note_name):] else 0
+
+    return A4hz * (2**(octave_offset + note_offset/12 + cent_offset/1200))
 
 class Sine:
     """
