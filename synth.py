@@ -6,7 +6,6 @@ from itertools import accumulate
 
 import sounddevice as sd
 import numpy as np
-import time
 import utils
 
 SAMPLERATE = 44100
@@ -50,14 +49,21 @@ def note_to_freq(note: str, cent_offset: float=0, A4hz=440) -> float:
     Turns a note name with a pattern of "<note-letter><optional-#-or-b><optional-octave>" (each being a single char)
     into frequency. Uses Equal Temperament.
     :param note: The note to be converted. "<note-letter><optional-#-or-b><optional-octave>"
-    :param cent_offset: Cents are 1/100th of a half step. Anything more than 49 is redundant.
+    :param cent_offset: Cents are 1/100th of a half step.
+    :param A4hz: The frequency of an A4 (some instruments like marimbas are tuned to 442hz)
     :return: The frequency of the note with the specified offset in cents
     """
-    utils.check_param(float | int, ">=0", "<49", p="cent_offset")
+    utils.check_param(float | int, ">=0", p="cent_offset")
 
-    note_name = note[:2] if note[1] in ("#", "b") else note[:1]
+    if len(note) != 1:
+        note_name = note[:2] if note[1] in ("#", "b") else note[:1]
+    else: note_name = note
+
     note_offset = note_distance_from_A[note_name]
     octave_offset = int(note[len(note_name):]) - 4 if note[len(note_name):] else 0
+
+    # Because the dictionary is based on A, not all the octaves line up without this.
+    if not note_name in ("A", "A#", "Bb", "B", "Cb"): octave_offset -= 1
 
     return A4hz * (2**(octave_offset + note_offset/12 + cent_offset/1200))
 
