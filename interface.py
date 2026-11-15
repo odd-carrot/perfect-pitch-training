@@ -17,11 +17,6 @@ import synth
 import utils
 
 
-
-
-
-
-
 def test_single_note():
     """
     The purpose of this function is to test the user on single note recognition.
@@ -65,8 +60,8 @@ def multi_note(num_of_notes: int, time_between: float):
     :param time_between: The length (in seconds) of each note
     :return:
     """
-    utils.check_param(int, p="num_of_notes")
-    utils.check_param(int | float, p="time_between")
+    utils.check_param(int, ">0", p="num_of_notes")
+    utils.check_param(int | float, ">0", p="time_between")
 
     note_list = synth.play_random_notes(num_of_notes, time_between)
 
@@ -87,6 +82,7 @@ def multi_note(num_of_notes: int, time_between: float):
 
     if ask_for_repeat():
         multi_note(num_of_notes, time_between)
+
 
 def chord_recognition():
     """
@@ -122,6 +118,30 @@ def chord_recognition():
         chord_recognition()
 
 
+def tuning_practice(cent_range: int, absolute_pitch: bool=False):
+    """
+    Tests the user on more fine recognition of notes than test_single_note.
+    This function plays a tone at different distances from the true tone, then asks the user if
+    the note was flat or sharp. The goal is to be able to tune anything by ear.
+    :return: None
+    """
+    # pick the note
+    note = random.choice(synth.listofnotes)
+    cent_offset = random.randint(-cent_range, cent_range)
+
+    if not absolute_pitch: synth.Tone(synth.note_to_freq(note)).play(1)
+    # play out of tune note (with variation on how far from the note it is)
+    synth.Tone(synth.note_to_freq(note, cent_offset=cent_offset)).play(1)
+
+    if absolute_pitch: user_input = input("Was that note sharp or flat?")
+    else: user_input = input("Was the second note sharp (s) or flat (f)?")
+    correct = user_input == "s" and cent_offset > 0 or user_input == "f" and cent_offset < 0
+    if correct: print("YAY you got it right")
+    else: print("Incorrect.")
+    print(f"The cent offset was: {cent_offset}")
+
+    if ask_for_repeat(): tuning_practice(cent_range, absolute_pitch=absolute_pitch)
+    else: menu()
 
 
 def ask_for_repeat():
@@ -160,8 +180,6 @@ def menu():
     elif user_input == 4:
         bridge.load_qml_application()
         sleep(10)
-
-
 
 
 

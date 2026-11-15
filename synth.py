@@ -53,7 +53,7 @@ def note_to_freq(note: str, cent_offset: float=0, A4hz=440) -> float:
     :param A4hz: The frequency of an A4 (some instruments like marimbas are tuned to 442hz)
     :return: The frequency of the note with the specified offset in cents
     """
-    utils.check_param(float | int, ">=0", p="cent_offset")
+    utils.check_param(float | int, p="cent_offset")
 
     if len(note) != 1:
         note_name = note[:2] if note[1] in ("#", "b") else note[:1]
