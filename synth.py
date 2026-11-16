@@ -8,7 +8,7 @@ import sounddevice as sd
 import numpy as np
 import utils
 
-SAMPLERATE = 44100
+SAMPLERATE = 44000
 
 listoftones = ('130.8', '138.6', '146.8', '155.6', '164.8', '174.6', '185.0', '196.0', '207.7', '220.0', '233.1',
                '246.9', '261.6', '277.2', '293.7', '311.1', '329.6', '349.2', '370.0', '392.0', '415.3', '440.0',
@@ -44,14 +44,14 @@ note_distance_from_A = {
 }
 
 
-def note_to_freq(note: str, cent_offset: float=0, A4hz=440) -> float:
+def note_to_freq(note: str, cent_offset: float=0, A4hz=440, round_num=1) -> float:
     """
     Turns a note name with a pattern of "<note-letter><optional-#-or-b><optional-octave>" (each being a single char)
     into frequency. Uses Equal Temperament.
     :param note: The note to be converted. "<note-letter><optional-#-or-b><optional-octave>"
     :param cent_offset: Cents are 1/100th of a half step.
     :param A4hz: The frequency of an A4 (some instruments like marimbas are tuned to 442hz)
-    :return: The frequency of the note with the specified offset in cents
+    :return: The frequency of the note with the specified offset in cents rounded
     """
     utils.check_param(float | int, p="cent_offset")
 
@@ -65,20 +65,52 @@ def note_to_freq(note: str, cent_offset: float=0, A4hz=440) -> float:
     # Because the dictionary is based on A, not all the octaves line up without this.
     if not note_name in ("A", "A#", "Bb", "B", "Cb"): octave_offset -= 1
 
-    return A4hz * (2**(octave_offset + note_offset/12 + cent_offset/1200))
+    return round(A4hz * (2**(octave_offset + note_offset/12 + cent_offset/1200)), round_num)
+
+
+def fraction_approx(f: float, error=1e-2, max=100) -> int:
+    """
+    finds the lowest integer that when multiplied by the float brings it's decimal part
+    lower than the error.
+    :param f: The float described above.
+    :return: The lowest integer that when multiplied by the float brings it's decimal part lower than the error.
+    """
+    a = 100
+    fd = f%1
+    a1 = f%1
+    best = 0
+
+    for x in range(2,max):
+        a1 += fd
+        if abs(a1%1) < error:
+            print(x)
+            return x
+        elif abs(a1%1) < a:
+            a = a1%1
+            best = x
+
+    print("aw man")
+
+    return best
+
 
 class Sine:
     """
     The smallest repeatable snippet of a given frequency sine wave
 
-    Arrays have length (1/hz)*SAMPLERATE
+    The snippets have various lengths. This is because there would be a rounding error for
+    some frequencies if only one cycle of the wave was repeated
+    (the frequency actually played would be limited to multiples of the sample rate)
     Can be concatenated to form various tone lengths
     """
     def __init__(self, hz: float):
         custom_sin = lambda x: (400/hz)*np.sin((hz * np.pi * 2 / SAMPLERATE) * x)
         self.hz = hz
         self.period = float(1/hz)
-        self.snippet = np.fromfunction(custom_sin, (int(self.period*SAMPLERATE),), dtype=np.float32)
+        # Lowest reasonable cycles for the end of the snippet to line up with the next
+        # See docstring of class Sine
+        self.lrc = fraction_approx(self.period*SAMPLERATE, max=1000)
+        self.snippet = np.fromfunction(custom_sin, (int(self.period*SAMPLERATE*self.lrc),), dtype=np.float32)
 
 
     def __str__(self):
@@ -103,10 +135,10 @@ class Tone:
         utils.check_param(int | float, "< 3", "> 0", p="loudness")
 
         array_len = int(length*SAMPLERATE)
-        a = np.tile(self.tones[0].snippet,int(length*1.1/self.tones[0].period))[:array_len]
+        a = np.tile(self.tones[0].snippet, int(array_len/len(self.tones[0].snippet))+1)[:array_len]
 
         for x in self.tones[1:]:
-            a = np.add(a, np.tile(x.snippet,int(length*1.1/x.period)+2)[:array_len])
+            a = np.add(a, np.tile(x.snippet, int(array_len/len(x.snippet))+1)[:array_len])
 
         sd.play(a*loudness/len(self.tones), SAMPLERATE, blocking=block)
 
