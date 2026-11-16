@@ -20,7 +20,9 @@ def check_param(*args, p:str='') -> None:
     """
     assert p, "You forgot to set p in utils.check_param"
     frame = sys._getframe(1)
-    pv = frame.f_locals[p]
+    try:
+        pv = frame.f_locals[p]
+    except: return None
     func_name = frame.f_code.co_name
     for x in args:
         if isinstance(x, type | types.UnionType):
