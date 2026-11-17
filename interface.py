@@ -23,32 +23,13 @@ def test_single_note():
     This function asks for input within the command line using input()
     :return: None
     """
-    # get a random note from listofnotes
     note = random.choice(synth.listofnotes)
     synth.Tone(float(synth.notedict[note])).play(1)
-    user_answer = input("What was that note?\n")
-    is_correct = "YAY you got it right"
-    is_incorrect = f"dang the note was {note[0]}"
 
-    user_answer = user_answer.upper()
+    check_note(note, prompt="What was that note?\n")
 
-    if note[0][0] in user_answer and len(user_answer) <= 3:
-        if "#" in note[0]:
-            if "#" in user_answer:
-                print(is_correct)
-            else:
-                print(is_incorrect)
-        else:
-            print(is_correct)
-    else:
-        print(is_incorrect)
-
-    exit_or_continue = input("Press Enter to play again :D \n (or type \"exit\" to exit)\n")
-    if exit_or_continue != "exit":
+    if ask_for_repeat():
         test_single_note()
-    else:
-        print("Ok bye :(")
-        return
 
 
 def multi_note(num_of_notes: int, time_between: float):
@@ -66,19 +47,7 @@ def multi_note(num_of_notes: int, time_between: float):
     note_list = synth.play_random_notes(num_of_notes, time_between)
 
     for i in range(len(note_list)):
-        is_correct = "correct :D"
-        is_incorrect = f"INCORRECT :( ({note_list[i]})"
-        user_answer = input(f"Note {i + 1}: ").upper()
-        if note_list[i][0] in user_answer and len(user_answer) <= 3:
-            if "#" in note_list[i]:
-                if "#" in user_answer:
-                    print(is_correct)
-                else:
-                    print(is_incorrect)
-            else:
-                print(is_correct)
-        else:
-            print(is_incorrect)
+        check_note(note_list[i], prompt=f"Note {i}:")
 
     if ask_for_repeat():
         multi_note(num_of_notes, time_between)
@@ -93,24 +62,14 @@ def chord_recognition():
     """
     root = random.randint(7, 20)
     chord_type = synth.play_chord('random', root)
-    print("What was the root of that chord?")
-    correct = "correct :D"
-    incorrect = f"INCORRECT :( ({synth.listofnotes[root]})"
-    user_answer1 = input(f"Note: ").upper()
-    if synth.listofnotes[root][0] not in user_answer1[:3]:
-        print(incorrect)
-    elif "#" in synth.listofnotes[root]:
-        if "#" not in user_answer1:
-            print(incorrect)
-        else:
-            print(correct)
-    else:
-        print(correct)
+
+    check_note(synth.listofnotes[root][0], prompt="What was the root of that chord?")
 
     print("What kind of chord was that? \n (Maj, min, aug, dim, maj7, min7, or majmin7)")
-    user_answer2 = input("").lower()
-    if chord_type == user_answer2:
-        print(correct)
+
+    user_answer = input("").lower()
+    if chord_type == user_answer:
+        print("YAY you were right!")
     else:
         print(f"INCORRECT :( ({chord_type})")
 
@@ -141,7 +100,6 @@ def tuning_practice(cent_range: int, absolute_pitch: bool=False):
     print(f"The cent offset was: {cent_offset}")
 
     if ask_for_repeat(): tuning_practice(cent_range, absolute_pitch=absolute_pitch)
-    else: menu()
 
 
 def ask_for_repeat():
@@ -157,6 +115,24 @@ def ask_for_repeat():
         menu()
 
 
+def check_note(answer, prompt="Note:"):
+    is_correct = "YAY you got it right"
+    is_incorrect = f"dang the note was {answer}"
+
+    user_answer = input(f"{prompt} ").upper()
+
+    if answer[0] in user_answer and len(user_answer) <= 3:
+        if "#" in answer:
+            if "#" in user_answer:
+                print(is_correct)
+            else:
+                print(is_incorrect)
+        else:
+            print(is_correct)
+    else:
+        print(is_incorrect)
+
+
 def menu():
     print("Pick a program by entering its number:")
     print("Pitch recognition with multiple notes (1)")
@@ -164,7 +140,10 @@ def menu():
     print("Chord recognition (3)")
     print("QML application (4)")
     print("Exit the program (0)")
-    user_input = int(input("\n"))
+    try:
+        user_input = int(input("\n"))
+    except:
+        print("Please enter a number")
 
     if user_input == 0:
         assert False, "User has a life"
@@ -180,6 +159,9 @@ def menu():
     elif user_input == 4:
         bridge.load_qml_application()
         sleep(10)
+    else:
+        print("Please enter one of the numbers above")
+        menu()
 
 
 
