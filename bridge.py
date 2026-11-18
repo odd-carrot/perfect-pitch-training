@@ -12,6 +12,7 @@ import interface
 QML_IMPORT_NAME = "io.sound"
 QML_IMPORT_MAJOR_VERSION = 1
 
+qml_note = None
 
 @QmlElement
 class Bridge(QObject):
@@ -20,35 +21,11 @@ class Bridge(QObject):
     between the graphical interface and the Python script.
     """
 
-    @Slot(str, result=str)
-    def exponentiate(self, s):
-        the_integer = int(s)
-        return str(the_integer*the_integer)
-
-    @Slot(str)
-    def triggerSound(self, s):
-        synth.play_chord("random", random.randint(7, 15))
-        print(s)
-
-    @Slot()
-    def triggerNoteRecognition(self):
-        interface.test_single_note()
-
-    @Slot(str, result=str)
-    def ghostlyWhispers(self, s):
-        if "I'm" in s:
-            return_string = "You're" + s[3:]
-        else: return_string = s
-        print(s)
-        return return_string
-
-    # The last note played in single note recognition for the qml side.
-    qml_note = random.sample(synth.listofnotes, 1)
-
     @Slot()
     def playSingleNote(self):
-        self.qml_note = random.sample(synth.listofnotes, 1)
-        synth.Tone(float(synth.notedict[self.qml_note[0]])).play(1, block=False)
+        global qml_note
+        qml_note = random.choice(synth.listofnotes)
+        synth.Tone(float(synth.notedict[qml_note])).play(1, block=False)
 
 
     @Slot(str, result=str)
@@ -61,18 +38,22 @@ class Bridge(QObject):
         :param s: The user input from the qml GUI
         :return: "" or f"dang the note was {self.qml_note[0]}" based on whether the user was right.
         """
+        global qml_note
         s = s.upper()
 
-        if self.qml_note[0][0] in s and len(s) <= 3:
-            if "#" in self.qml_note[0]:
+        # support for multiple notes
+        answer = qml_note if type(qml_note) == str else qml_note.pop(0)
+
+        if answer[0] in s and len(s) <= 3:
+            if "#" in answer:
                 if "#" in s:
                     return ""
                 else:
-                    return f"dang the note was {self.qml_note[0]}"
+                    return f"dang the note was {answer}"
             else:
                 return ""
         else:
-            return f"dang the note was {self.qml_note[0]}"
+            return f"dang the note was {answer}"
 
 
 def load_qml_application():

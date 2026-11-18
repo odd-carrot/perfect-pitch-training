@@ -1,20 +1,14 @@
 import QtQuick
-import "../components"
 
-FancyMenu {
-    id: mainMenu
-    menuWidth: 60
-    header: Text {
-        text: "Menu"
-        color: "black"
+Column {
+    anchors.centerIn: parent
+    RoundButton {
+        text: "single note recognition"
+        radius: 5
+        height: 30
+
+        anchors {left: parent.left; right: parent.right}
+
+        
     }
-    menu: ListView {
-        visible: false
-        clip: true
-        spacing: 2
-        width: mainMenu.menuWidth-6; height: mainMenu.menuHeight-5
-        model: 5 
-        delegate: ToggleButton {}
-    }
-    onMenuClicked: this.openMenu()
 }

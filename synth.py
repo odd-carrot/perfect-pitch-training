@@ -44,7 +44,7 @@ note_distance_from_A = {
 }
 
 
-def note_to_freq(note: str, cent_offset: float=0, A4hz=440, round_num=1) -> float:
+def note_to_freq(note: str, cent_offset: float=0, A4hz=440, round_num=3) -> float:
     """
     Turns a note name with a pattern of "<note-letter><optional-#-or-b><optional-octave>" (each being a single char)
     into frequency. Uses Equal Temperament.
@@ -83,13 +83,13 @@ def fraction_approx(f: float, error=1e-2, max=100) -> int:
     for x in range(2,max):
         a1 += fd
         if abs(a1%1) < error:
-            print(x)
+            # print(x)
             return x
         elif abs(a1%1) < a:
             a = a1%1
             best = x
 
-    print("aw man")
+    # print("aw man")
 
     return best
 
@@ -119,7 +119,7 @@ class Sine:
 
 class Tone:
     """
-    Each object contains the first cycle of each component (Sine types) of the tone.
+    Each object contains a sample of each component (Sine types) of the tone.
     The components are then tiled together to the required length, and added together
     in order to be played.
     """
@@ -161,12 +161,12 @@ def play_random_notes(n: int, seconds: float) -> list:
     return random_notes
 
 
-def play_chord(chord_type, root):
+def play_chord(chord_type: str, root: int):
     """
     Plays maj, min, aug, dim, maj7, min7, and majmin7 chords.
-    :param chord_type:
-    :param root:
-    :return:
+    :param chord_type: The type of chord to be played. Must be the chords specified above.
+    :param root: The index of the root of the note in listofnotes
+    :return: None
     """
     utils.check_param(str, p="chord_type")
     utils.check_param(int, p="root")
@@ -190,4 +190,4 @@ def play_chord(chord_type, root):
     return chord_type
 
 if __name__ == "__main__":
-    Tone(440, 523, 622, 740, 880).play(1)
+    Tone(440, 523, 622, 740, 880.1).play(1)
