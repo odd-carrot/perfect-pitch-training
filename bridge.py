@@ -12,6 +12,14 @@ import interface
 QML_IMPORT_NAME = "io.sound"
 QML_IMPORT_MAJOR_VERSION = 1
 
+setting_in_question = "volume"
+
+settings = {
+    "volume": 1.0,
+    "note_number": 3,
+    "absolute_pitch": True
+}
+
 qml_note = None
 
 @QmlElement
@@ -25,7 +33,14 @@ class Bridge(QObject):
     def playSingleNote(self):
         global qml_note
         qml_note = random.choice(synth.listofnotes)
-        synth.Tone(float(synth.notedict[qml_note])).play(1, block=False)
+        note = synth.Tone(float(synth.notedict[qml_note]))
+        note.play(1, volume=settings["volume"], block=False)
+
+
+    @Slot()
+    def playMultiNote(self):
+        global qml_note
+        qml_note = synth.play_random_notes(3, 1, volume=settings["volume"])
 
 
     @Slot(str, result=str)
@@ -54,6 +69,48 @@ class Bridge(QObject):
                 return ""
         else:
             return f"dang the note was {answer}"
+
+
+    @Slot(bool)
+    def setBool(self, b):
+        global settings
+        if type(settings[setting_in_question]) != bool:
+            print("ERROR: The setting in question is not a boolean")
+
+        try:
+            settings[setting_in_question] = b
+        except:
+            print("ERROR: The setting in question does not exist")
+
+
+    @Slot(int)
+    def setInt(self, i):
+        global settings
+        if type(settings[setting_in_question]) != int:
+            print("ERROR: The setting in question is not an int")
+
+        try:
+            settings[setting_in_question] = i
+        except:
+            print("ERROR: The setting in question does not exist")
+
+
+    @Slot(float)
+    def setFloat(self, f):
+        global settings
+        if type(settings[setting_in_question]) != float:
+            print("ERROR: The setting in question is not a float")
+
+        try:
+            settings[setting_in_question] = f
+        except:
+            print("ERROR: The setting in question does not exist")
+
+
+    @Slot(str)
+    def sendSetting(self, s):
+        global setting_in_question
+        setting_in_question = s
 
 
 def load_qml_application():

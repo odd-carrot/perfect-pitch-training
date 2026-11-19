@@ -1,11 +1,40 @@
+pragma NativeMethodBehavior: AcceptThisObject
 import QtQuick
 import QtQuick.Controls
+import io.sound 1.0
+import "../components"
 
 Item {
     id: root
-    anchors.centerIn: parent
     property string color: "black"
-    signal answerEvaluated(isCorrect: bool)
+    signal playNoteSeq()
+    signal exitToMenu()
+
+    function changeVolume(value) {
+        python.sendSetting("volume")
+        python.setFloat(value)
+    }
+
+    Bridge { id: python }
+
+    Row {
+        height: 30
+        width: 300
+        spacing: 8
+        StyledButton {
+            height: 30; width: 50
+            text: "Main Menu"
+            onPressed: root.exitToMenu()
+        }
+        Slider {
+            id: volumeControl
+            height: 30; width: 50
+            to: 1.0
+            value: 1.0
+            stepSize: 0.1
+            onValueChanged: root.changeVolume(this.value)
+        }
+    }
     
     TextField {
         anchors.centerIn: parent
@@ -25,8 +54,8 @@ Item {
                 this.clear()
             }
             else {
-                python.playSingleNote()
-            }
+                playNoteSeq()
             }
         }
+    }
 }

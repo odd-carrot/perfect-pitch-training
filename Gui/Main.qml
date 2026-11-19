@@ -12,6 +12,12 @@ ApplicationWindow {
         id: python
     }
 
+    Connections {
+        target: stack.currentItem
+        ignoreUnknownSignals: true
+        function onExitToMenu() { stack.popToIndex(0) }
+    }
+
     StackView {
         id: stack 
         anchors.fill: parent
@@ -22,15 +28,27 @@ ApplicationWindow {
             Column {
                 anchors.centerIn: parent
                 width: root.width / 2
-                RoundButton {
+                spacing: 5
+                StyledButton {
                     text: "Single note recognition"
                     radius: 5
                     height: 30
                     anchors {left: parent.left; right: parent.right}
 
                     onPressed: ()=> {
-                        stack.pushItem(Qt.resolvedUrl("widgets/RegularInterface.qml"))
+                        stack.pushItem(Qt.resolvedUrl("widgets/SingleNoteInterface.qml"))
                         python.playSingleNote()
+                    }
+                }
+                StyledButton {
+                    text: "Sequence note recognition"
+                    radius: 5
+                    height: 30
+                    anchors {left: parent.left; right: parent.right}
+
+                    onPressed: ()=> {
+                        stack.pushItem(Qt.resolvedUrl("widgets/SequenceInterface.qml"))
+                        python.playMultiNote()
                     }
                 }
             }

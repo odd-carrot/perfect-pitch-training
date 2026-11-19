@@ -3,6 +3,7 @@ Synth module for playing sine tones.
 """
 import random
 from itertools import accumulate
+import time
 
 import sounddevice as sd
 import numpy as np
@@ -130,7 +131,7 @@ class Tone:
             self.tones.append(Sine(x))
 
 
-    def play(self, length: float, loudness=1.0, block=True):
+    def play(self, length: float, volume=1.0, block=True):
         utils.check_param(int | float, p="length")
         utils.check_param(int | float, "< 3", "> 0", p="loudness")
 
@@ -140,10 +141,10 @@ class Tone:
         for x in self.tones[1:]:
             a = np.add(a, np.tile(x.snippet, int(array_len/len(x.snippet))+1)[:array_len])
 
-        sd.play(a*loudness/len(self.tones), SAMPLERATE, blocking=block)
+        sd.play(a * volume / len(self.tones), SAMPLERATE, blocking=block)
 
 
-def play_random_notes(n: int, seconds: float) -> list:
+def play_random_notes(n: int, seconds: float, volume=1.0) -> list:
     """
     Plays random notes using Tone.play
 
@@ -156,7 +157,8 @@ def play_random_notes(n: int, seconds: float) -> list:
     random_notes = random.sample(listofnotes, n)
 
     for i in random_notes:
-        Tone(float(notedict[i])).play(seconds)
+        Tone(float(notedict[i])).play(seconds, volume=volume, block=False)
+        time.sleep(seconds)
 
     return random_notes
 
